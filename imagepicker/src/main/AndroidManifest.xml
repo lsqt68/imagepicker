@@ -35,7 +35,7 @@
 
         <provider
             android:name=".ImagePickerProvider"
-            android:authorities="${packageName} .provider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
