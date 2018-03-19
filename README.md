@@ -1,5 +1,5 @@
 # imagepicker
-在原开源图片选择控件（https://github.com/jeasonlzy/ImagePicker）基础上，加入预览和下载功能
+在原开源图片选择控件（[ImagePicker内含基础用法和说明介绍](https://github.com/jeasonlzy/ImagePicker)）基础上，加入预览和下载功能
 # Quick Start
 **配置build.gradle**
 
