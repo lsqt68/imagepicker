@@ -20,3 +20,19 @@ Step 2、
     dependencies {
         compile 'com.github.lsqt68:imagepicker:1.0.1'
     }
+    
+# 代码参考
+1、打开预览，参数解释：
+
+ImagePicker.EXTRA_IMAGE_ITEMS，传入要显示的图片链接列表；
+
+ImagePicker.EXTRA_SELECTED_IMAGE_POSITION，先显示第几张图；
+
+ImagePicker.EXTRA_PREVIEW_HIDE_DEL，隐藏删除按钮；
+
+    Intent intentPreview = new Intent(getContext(), ImagePreviewDelActivity.class);
+    intentPreview.putExtra(ImagePicker.EXTRA_IMAGE_ITEMS, ImageItemUtil.String2ImageItem(imgAdapter.getItems()));
+    intentPreview.putExtra(ImagePicker.EXTRA_SELECTED_IMAGE_POSITION, position);
+    intentPreview.putExtra(ImagePicker.EXTRA_FROM_ITEMS, true);
+    intentPreview.putExtra(ImagePicker.EXTRA_PREVIEW_HIDE_DEL, true);
+    startActivityForResult(intentPreview, REQUEST_CODE_PREVIEW);
