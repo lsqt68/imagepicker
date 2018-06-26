@@ -174,6 +174,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             //根据是否多选，显示或隐藏checkbox
             if (imagePicker.isMultiMode() && !showVideo) {
                 cbCheck.setVisibility(View.VISIBLE);
+                checkView.setVisibility(View.VISIBLE);
                 boolean checked = ImageItemUtil.getImagesIsCheck(mSelectedImages, imageItem);
                 if (checked) {
                     mask.setVisibility(View.VISIBLE);
@@ -184,6 +185,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             } else {
                 cbCheck.setVisibility(View.GONE);
+                checkView.setVisibility(View.GONE);
             }
             videoInfo.setVisibility(showVideo ? View.VISIBLE : View.GONE);
             videoTime.setText(showVideo ? Utils.timeParse(imageItem.width) : "");

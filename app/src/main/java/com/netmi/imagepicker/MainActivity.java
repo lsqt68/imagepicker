@@ -17,11 +17,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        ImagePicker.getInstance().setMultiMode(true);
         ImagePicker.getInstance().setSelectLimit(9);
         ImagePicker.getInstance().setShowCamera(false);
         ImagePicker.getInstance().setCrop(false);
         ImagePicker.getInstance().setShowVideoFile(false);
+        ImagePicker.getInstance().setMultiMode(false);
         Intent intent = new Intent(this, ImageGridActivity.class);
         startActivityForResult(intent, REQUEST_CODE_SELECT);
     }
