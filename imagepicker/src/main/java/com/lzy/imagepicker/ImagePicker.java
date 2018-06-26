@@ -63,6 +63,7 @@ public class ImagePicker {
     private int selectLimit = 9;         //最大选择图片数量
     private boolean crop = true;         //裁剪
     private boolean showCamera = true;   //显示相机
+    private boolean showVideoFile = false;  //显示视频文件选择,使用此选项请将crop=false
     private boolean isSaveRectangle = false;  //裁剪后的图片是否是矩形，否者跟随裁剪框的形状
     private int outPutX = 800;           //裁剪保存宽度
     private int outPutY = 800;           //裁剪保存高度
@@ -133,6 +134,14 @@ public class ImagePicker {
 
     public void setShowCamera(boolean showCamera) {
         this.showCamera = showCamera;
+    }
+
+    public boolean isShowVideoFile() {
+        return showVideoFile;
+    }
+
+    public void setShowVideoFile(boolean showVideoFile) {
+        this.showVideoFile = showVideoFile;
     }
 
     public boolean isSaveRectangle() {

@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.lzy.imagepicker.DataHolder;
 import com.lzy.imagepicker.ImageDataSource;
 import com.lzy.imagepicker.ImagePicker;
 import com.lzy.imagepicker.R;
+import com.lzy.imagepicker.VideoDataSource;
 import com.lzy.imagepicker.adapter.ImageFolderAdapter;
 import com.lzy.imagepicker.adapter.ImageRecyclerAdapter;
 import com.lzy.imagepicker.adapter.ImageRecyclerAdapter.OnImageItemClickListener;
@@ -47,7 +49,7 @@ import java.util.List;
  *         新增可直接传递是否裁剪参数，以及直接拍照
  *         ================================================
  */
-public class ImageGridActivity extends ImageBaseActivity implements ImageDataSource.OnImagesLoadedListener, OnImageItemClickListener, ImagePicker.OnImageSelectedListener, View.OnClickListener {
+public class ImageGridActivity extends ImageBaseActivity implements ImageDataSource.OnImagesLoadedListener, VideoDataSource.OnVideosLoadedListener, OnImageItemClickListener, ImagePicker.OnImageSelectedListener, View.OnClickListener {
 
     public static final int REQUEST_PERMISSION_STORAGE = 0x01;
     public static final int REQUEST_PERMISSION_CAMERA = 0x02;
@@ -243,13 +245,29 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, Utils.dp2px(this, 2), false));
         mRecyclerView.setAdapter(mRecyclerAdapter);
         mImageFolderAdapter.refreshData(imageFolders);
+        if (imagePicker.isShowVideoFile()) {
+            new VideoDataSource(this, null, this);
+        }
+    }
+
+    @Override
+    public void onVideosLoaded(List<ImageFolder> imageFolders) {
+        if (mImageFolders == null) {
+            imagePicker.setShowVideoFile(false);
+            onImagesLoaded(imageFolders);
+        } else {
+            mImageFolders.addAll(1, imageFolders);
+            imagePicker.setImageFolders(mImageFolders);
+            mImageFolderAdapter.refreshData(mImageFolders);
+        }
     }
 
     @Override
     public void onImageItemClick(View view, ImageItem imageItem, int position) {
         //根据是否有相机按钮确定位置
         position = imagePicker.isShowCamera() ? position - 1 : position;
-        if (imagePicker.isMultiMode()) {
+        if (imagePicker.isMultiMode()
+                && !TextUtils.equals(imagePicker.getImageFolders().get(imagePicker.getCurrentImageFolderPosition()).name, getString(R.string.ip_all_video))) {
             Intent intent = new Intent(ImageGridActivity.this, ImagePreviewActivity.class);
             intent.putExtra(ImagePicker.EXTRA_SELECTED_IMAGE_POSITION, position);
 

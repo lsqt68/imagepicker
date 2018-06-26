@@ -18,8 +18,9 @@ public class ImageItem implements Serializable, Parcelable {
 
     public String name;       //图片的名字
     public String path;       //图片的路径
+    public String thumb;       //视频的缩略图
     public long size;         //图片的大小
-    public int width;         //图片的宽度
+    public long width;         //图片的宽度
     public int height;        //图片的高度
     public String mimeType;   //图片的类型
     public long addTime;      //图片的创建时间
@@ -45,8 +46,9 @@ public class ImageItem implements Serializable, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.name);
         dest.writeString(this.path);
+        dest.writeString(this.thumb);
         dest.writeLong(this.size);
-        dest.writeInt(this.width);
+        dest.writeLong(this.width);
         dest.writeInt(this.height);
         dest.writeString(this.mimeType);
         dest.writeLong(this.addTime);
@@ -58,8 +60,9 @@ public class ImageItem implements Serializable, Parcelable {
     protected ImageItem(Parcel in) {
         this.name = in.readString();
         this.path = in.readString();
+        this.thumb = in.readString();
         this.size = in.readLong();
-        this.width = in.readInt();
+        this.width = in.readLong();
         this.height = in.readInt();
         this.mimeType = in.readString();
         this.addTime = in.readLong();

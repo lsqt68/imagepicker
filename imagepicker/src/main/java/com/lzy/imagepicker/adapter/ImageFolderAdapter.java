@@ -2,6 +2,7 @@ package com.lzy.imagepicker.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,9 @@ public class ImageFolderAdapter extends BaseAdapter {
         ImageFolder folder = getItem(position);
         holder.folderName.setText(folder.name);
         holder.imageCount.setText(mActivity.getString(R.string.ip_folder_image_count, folder.images.size()));
-        imagePicker.getImageLoader().displayImage(mActivity, folder.cover.path, holder.cover, mImageSize, mImageSize);
+        imagePicker.getImageLoader().displayImage(mActivity,
+                TextUtils.isEmpty(folder.cover.thumb) ? folder.cover.path : folder.cover.thumb,
+                holder.cover, mImageSize, mImageSize);
 
         if (lastSelected == position) {
             holder.folderCheck.setVisibility(View.VISIBLE);

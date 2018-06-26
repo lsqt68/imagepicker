@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lzy.imagepicker.ImagePicker;
@@ -25,13 +27,13 @@ import java.util.ArrayList;
 
 /**
  * 加载相册图片的RecyclerView适配器
- *
+ * <p>
  * 用于替换原项目的GridView，使用局部刷新解决选中照片出现闪动问题
- *
+ * <p>
  * 替换为RecyclerView后只是不再会导致全局刷新，
- *
+ * <p>
  * 但还是会出现明显的重新加载图片，可能是picasso图片加载框架的问题
- *
+ * <p>
  * Author: nanchen
  * Email: liushilin520@foxmail.com
  * Date: 2017-04-05  10:04
@@ -82,18 +84,18 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == ITEM_TYPE_CAMERA){
-            return new CameraViewHolder(mInflater.inflate(R.layout.adapter_camera_item,parent,false));
+        if (viewType == ITEM_TYPE_CAMERA) {
+            return new CameraViewHolder(mInflater.inflate(R.layout.adapter_camera_item, parent, false));
         }
-        return new ImageViewHolder(mInflater.inflate(R.layout.adapter_image_list_item,parent,false));
+        return new ImageViewHolder(mInflater.inflate(R.layout.adapter_image_list_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (holder instanceof CameraViewHolder){
-            ((CameraViewHolder)holder).bindCamera();
-        }else if (holder instanceof ImageViewHolder){
-            ((ImageViewHolder)holder).bind(position);
+        if (holder instanceof CameraViewHolder) {
+            ((CameraViewHolder) holder).bindCamera();
+        } else if (holder instanceof ImageViewHolder) {
+            ((ImageViewHolder) holder).bind(position);
         }
     }
 
@@ -122,10 +124,12 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    private class ImageViewHolder extends ViewHolder{
+    private class ImageViewHolder extends ViewHolder {
 
         View rootView;
+        View videoInfo;
         ImageView ivThumb;
+        TextView videoTime;
         View mask;
         View checkView;
         SuperCheckBox cbCheck;
@@ -134,15 +138,18 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
         ImageViewHolder(View itemView) {
             super(itemView);
             rootView = itemView;
+            videoInfo = itemView.findViewById(R.id.ll_video_info);
+            videoTime = itemView.findViewById(R.id.tv_video_time);
             ivThumb = (ImageView) itemView.findViewById(R.id.iv_thumb);
             mask = itemView.findViewById(R.id.mask);
-            checkView=itemView.findViewById(R.id.checkView);
+            checkView = itemView.findViewById(R.id.checkView);
             cbCheck = (SuperCheckBox) itemView.findViewById(R.id.cb_check);
             itemView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mImageSize)); //让图片是个正方形
         }
 
-        void bind(final int position){
+        void bind(final int position) {
             final ImageItem imageItem = getItem(position);
+            boolean showVideo = !TextUtils.isEmpty(imageItem.thumb);
             ivThumb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -165,7 +172,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
                 }
             });
             //根据是否多选，显示或隐藏checkbox
-            if (imagePicker.isMultiMode()) {
+            if (imagePicker.isMultiMode() && !showVideo) {
                 cbCheck.setVisibility(View.VISIBLE);
                 boolean checked = ImageItemUtil.getImagesIsCheck(mSelectedImages, imageItem);
                 if (checked) {
@@ -178,12 +185,14 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             } else {
                 cbCheck.setVisibility(View.GONE);
             }
-            imagePicker.getImageLoader().displayImage(mActivity, imageItem.path, ivThumb, mImageSize, mImageSize); //显示图片
+            videoInfo.setVisibility(showVideo ? View.VISIBLE : View.GONE);
+            videoTime.setText(showVideo ? Utils.timeParse(imageItem.width) : "");
+            imagePicker.getImageLoader().displayImage(mActivity, showVideo ? imageItem.thumb : imageItem.path, ivThumb, mImageSize, mImageSize); //显示图片
         }
 
     }
 
-    private class CameraViewHolder extends ViewHolder{
+    private class CameraViewHolder extends ViewHolder {
 
         View mItemView;
 
@@ -192,7 +201,7 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ViewHolder> {
             mItemView = itemView;
         }
 
-        void bindCamera(){
+        void bindCamera() {
             mItemView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mImageSize)); //让图片是个正方形
             mItemView.setTag(null);
             mItemView.setOnClickListener(new View.OnClickListener() {
