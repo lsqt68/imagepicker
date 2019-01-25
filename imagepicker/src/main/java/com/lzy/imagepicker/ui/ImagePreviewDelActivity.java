@@ -9,10 +9,12 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -138,7 +140,30 @@ public class ImagePreviewDelActivity extends ImagePreviewBaseActivity implements
     /**
      * @param croppedImage 保存的图片
      */
-    public void saveBitmapToFile(final Bitmap croppedImage) {
+    public void saveBitmapToFile(Bitmap croppedImage) {
+        if (mSaving) return;
+        try {
+            String path = MediaStore.Images.Media.insertImage(getBaseContext().getContentResolver(), croppedImage, String.valueOf(new Date().getTime()), "");
+
+            if (TextUtils.isEmpty(path)){       //保存失败,使用原有方式下载
+                saveBitmapToFile2(croppedImage);
+                return;
+            }
+
+            showToast("已保存至  " + path.substring(0, path.lastIndexOf(File.separator)) + " 文件夹");
+
+            mSaving = true;
+            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri uri = Uri.parse(path);
+            intent.setData(uri);
+            getBaseContext().sendBroadcast(intent);
+        }catch (Exception e){
+            //保存失败,使用原有方式下载
+            saveBitmapToFile2(croppedImage);
+        }
+    }
+
+    public void saveBitmapToFile2(final Bitmap croppedImage) {
         if (mSaving) return;
         mSaving = true;
         Observable.create(new ObservableOnSubscribe<File>() {
