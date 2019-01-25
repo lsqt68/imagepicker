@@ -142,24 +142,83 @@ public class ImagePreviewDelActivity extends ImagePreviewBaseActivity implements
      */
     public void saveBitmapToFile(Bitmap croppedImage) {
         if (mSaving) return;
-        mSaving = true;
         try {
             String path = MediaStore.Images.Media.insertImage(getBaseContext().getContentResolver(), croppedImage, String.valueOf(new Date().getTime()), "");
 
-            if (TextUtils.isEmpty(path)){
-                showToast("保存失败，请稍候再试!");
+            if (TextUtils.isEmpty(path)){       //保存失败,使用原有方式下载
+                saveBitmapToFile2(croppedImage);
                 return;
             }
 
             showToast("已保存至  " + path.substring(0, path.lastIndexOf(File.separator)) + " 文件夹");
 
+            mSaving = true;
             Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             Uri uri = Uri.parse(path);
             intent.setData(uri);
             getBaseContext().sendBroadcast(intent);
         }catch (Exception e){
-            showToast("保存失败，请稍候再试!");
+            //保存失败,使用原有方式下载
+            saveBitmapToFile2(croppedImage);
         }
+    }
+
+    public void saveBitmapToFile2(final Bitmap croppedImage) {
+        if (mSaving) return;
+        mSaving = true;
+        Observable.create(new ObservableOnSubscribe<File>() {
+            @Override
+            public void subscribe(ObservableEmitter<File> oe) throws Exception {
+                Bitmap.CompressFormat outputFormat = Bitmap.CompressFormat.JPEG;
+                File saveFile = createFile(imagePicker.getSaveImageFile(ImagePreviewDelActivity.this), "IMG_", ".jpg");
+                OutputStream outputStream = null;
+                try {
+                    outputStream = getContentResolver().openOutputStream(Uri.fromFile(saveFile));
+                    if (outputStream != null) croppedImage.compress(outputFormat, 90, outputStream);
+                    oe.onNext(saveFile);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    oe.onError(ex);
+                } finally {
+                    if (outputStream != null) {
+                        try {
+                            outputStream.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    oe.onComplete();
+                }
+                // croppedImage.recycle();
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<File>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(File value) {
+                        //发送广播通知图片增加了
+                        ImagePicker.galleryAddPic(ImagePreviewDelActivity.this, value);
+                        String path = value.getAbsolutePath();
+                        showToast("已保存至  " + path.substring(0, path.lastIndexOf(File.separator)) + " 文件夹");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showToast("保存失败，请稍候再试!");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        mSaving = false;
+                    }
+                });
+
     }
 
     /**
