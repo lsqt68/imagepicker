@@ -109,6 +109,8 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, Utils.dp2px(this, 2), false));
 
         findViewById(R.id.btn_back).setOnClickListener(this);
         mBtnOk = (Button) findViewById(R.id.btn_ok);
@@ -130,6 +132,8 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
 //        mImageGridAdapter = new ImageGridAdapter(this, null);
         mImageFolderAdapter = new ImageFolderAdapter(this, null);
         mRecyclerAdapter = new ImageRecyclerAdapter(this, null);
+        mRecyclerAdapter.setOnImageItemClickListener(this);
+        mRecyclerView.setAdapter(mRecyclerAdapter);
 
         onImageSelected(0, null, false);
 
@@ -240,10 +244,6 @@ public class ImageGridActivity extends ImageBaseActivity implements ImageDataSou
             mRecyclerAdapter.refreshData(imageFolders.get(0).images);
         }
 //        mImageGridAdapter.setOnImageItemClickListener(this);
-        mRecyclerAdapter.setOnImageItemClickListener(this);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, Utils.dp2px(this, 2), false));
-        mRecyclerView.setAdapter(mRecyclerAdapter);
         mImageFolderAdapter.refreshData(imageFolders);
         if (imagePicker.isShowVideoFile()) {
             new VideoDataSource(this, null, this);
