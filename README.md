@@ -18,7 +18,7 @@ Step 2、
 并在当前App的 build.gradle 文件中引用，如下：
 
     dependencies {
-        implementation 'com.github.lsqt68:imagepicker:1.0.7'
+        implementation 'com.github.lsqt68:imagepicker:1.0.8'
     }
     
 # 代码参考
